@@ -1,14 +1,12 @@
 /* Global Variables */
 //personal API key credentials
-const cred = '&appid=c0071ac38646a1b38199175174f333cd&units=metric';
+const cred = '&country=DE=&maxRows=10&username=esnue';
 //base url for open weather API
-const baseURL = 'http://api.openweathermap.org/data/2.5/weather?zip=';
-// Create a new date instance dynamically with JS
-let d = new Date();
-let newDate = (d.getMonth()+1) + '.' + d.getDate() + '.' + d.getFullYear();
+const baseURL = 'http://api.geonames.org/postalCodeSearchJSON?postalcode=';
 
-//async function that uses fetch() to make a GET request to the OpenWeatherMap API.
-const getWeather = async (baseURL, zip, cred) => {
+
+//async function that uses fetch() to make a GET request to the Geonames API 
+const getGeonames = async (baseURL, zip, cred) => {
     const request = await fetch(baseURL + zip + cred);
     try {
         // Transform into JSON
@@ -22,25 +20,21 @@ const getWeather = async (baseURL, zip, cred) => {
     }
 };
 
-//Create an event listener for the element with the id: generate, with a callback function to execute when it is clicked.
-//document.getElementById('generate').addEventListener('click', callBack);
 //define APICall
-function APICall(e) {
+function APICall() {
     //get user's input from the zip input section
     let zip = document.getElementById('zip').value;
-    //get user's input from the feelings input section
-    let feeling = document.getElementById('feelings').value;
     //call the retrieveWeather function inside the callBack with updated parameters
-    getWeather(baseURL, zip, cred)
+    getGeonames(baseURL, zip, cred)
     //chain POST promise
     .then(function(data) {
           console.log(data);
           let temp = data.main.temp;
           console.log(temp);
           postData('/add', {
-              date: newDate,
-              temp: temp,
-              feel: feeling
+              place: placeName,
+              lng: lng,
+              lat: lat
             });
         })
       //chain UI update promise
@@ -77,9 +71,9 @@ const updateUI = async () => {
         const request = await fetch('/all');
         console.log(request);
         const allData = await request.json();
-        document.getElementById('date').innerHTML = `Today is ${allData.date}`;
-        document.getElementById('temp').innerHTML = `It is ${allData.temp} degrees outside.`;
-        document.getElementById('content').innerHTML = `Your latest journal entry: ${allData.feel}`;
+        document.getElementById('place').innerHTML = `Today is ${allData.placeName}`;
+        document.getElementById('lng').innerHTML = `It is ${allData.lng} degrees outside.`;
+        document.getElementById('lat').innerHTML = `Your latest journal entry: ${allData.lat}`;
     } catch (error) {
         console.log('Unable to update UI', error);
     }
